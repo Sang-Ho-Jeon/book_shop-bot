@@ -1,0 +1,173 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "book_shop API",
+    "description": "다양한 엔드포인트를 가진 샘플 API",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "/",
+      "description": "메인 서버"
+    }
+  ],
+  "paths": {
+    "/qa/list": {
+      "get": {
+        "operationId": "getQaList",
+        "summary": "문의 리스트 조회",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "현재 페이지 번호",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "한 페이지 결과 수",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "문의 리스트 반환"
+          }
+        }
+      }
+    },
+    "/book/list": {
+      "get": {
+        "operationId": "getBookList",
+        "summary": "도서 리스트 조회",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "현재 페이지 번호",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "한 페이지 결과 수",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 10
+            }
+          },
+          {
+            "name": "order_criteria",
+            "in": "query",
+            "description": "정렬 기준",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "book_reg_date"
+            }
+          },
+          {
+            "name": "order_direction",
+            "in": "query",
+            "description": "정렬 방향",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "ASC"
+            }
+          },
+          {
+            "name": "keyword",
+            "in": "query",
+            "description": "검색 키워드",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "도서 리스트 반환"
+          }
+        }
+      }
+    },
+    "/cart/list": {
+      "get": {
+        "operationId": "getCartList",
+        "summary": "장바구니 리스트 조회",
+        "responses": {
+          "200": {
+            "description": "장바구니 리스트 반환"
+          }
+        }
+      }
+    },
+    "/user/signup": {
+      "post": {
+        "operationId": "userSignup",
+        "summary": "사용자 회원가입",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "member": {
+                    "type": "string",
+                    "description": "회원 객체"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "회원가입 성공"
+          }
+        }
+      }
+    },
+
+    "/cscenter/faq/list": {
+      "get": {
+        "operationId": "getFaqList",
+        "summary": "FAQ 리스트 조회",
+        "parameters": [
+          {
+            "name": "cateCode",
+            "in": "query",
+            "description": "카테고리 코드 번호",
+            "required": true,
+            "schema": {
+              "type": "String",
+              "example": "00"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "FAQ 리스트 반환"
+          }
+        }
+      }
+    }
+  }
+}

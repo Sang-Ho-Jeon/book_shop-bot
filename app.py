@@ -4,10 +4,11 @@ from dotenv import load_dotenv
 import os
 from openai import OpenAI
 
-from config import Config
-
 from database import get_db, init_db
 from sqlalchemy import text
+
+from config import Config
+from controller.chat_controller import bp_chat
 
 load_dotenv()
 app = Flask(__name__)
@@ -20,6 +21,8 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'None'  # 쿠키의 SameSite 속성 설�
 
 # 데이터베이스 연결을 위한 세션 팩토리 생성
 session_factory = init_db(env_config)
+
+app.register_blueprint(bp_chat)
 
 app.secret_key = os.urandom(24)  # 세션을 위한 시크릿 키 설정
 CORS(app, supports_credentials=True)  # CORS 설정 적용
@@ -70,7 +73,7 @@ def index():
                 WHERE title LIKE :title
             """)
             books = db.execute(query, {"title": f"%{search_query}%"}).fetchall()
-            
+
             if books:
                 books_data = [
                     {
