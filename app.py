@@ -4,11 +4,12 @@ from dotenv import load_dotenv
 import os
 from openai import OpenAI
 
+from controller.chat_controller import bp_chat
 from database import get_db, init_db
 from sqlalchemy import text
 
 from config import Config
-from controller.chat_controller import bp_chat
+
 
 load_dotenv()
 app = Flask(__name__)
@@ -19,6 +20,10 @@ env_config = Config();
 app.config['SESSION_COOKIE_SECURE'] = True  # HTTPS가 아닌 환경에서 쿠키 전송 허용
 app.config['SESSION_COOKIE_SAMESITE'] = 'None'  # 쿠키의 SameSite 속성 설정
 
+# context 생성
+app_context = app.app_context()
+app_context.push()
+
 # 데이터베이스 연결을 위한 세션 팩토리 생성
 session_factory = init_db(env_config)
 
@@ -26,6 +31,7 @@ app.register_blueprint(bp_chat)
 
 app.secret_key = os.urandom(24)  # 세션을 위한 시크릿 키 설정
 CORS(app, supports_credentials=True)  # CORS 설정 적용
+
 
 # OpenAI API를 사용하기 위한 인스턴스 생성
 api_key = env_config.OPEN_AI_KEY
@@ -44,7 +50,7 @@ def make_prompt(user_input):
 
 @app.route('/', methods=["POST"])
 def index():
-    db = next(get_db(session_factory))
+    db = next(get_db())
     bot_response = ""
     books_data = []
     faqs_data = []
@@ -146,6 +152,7 @@ def index():
         'books': books_data,
         'faqs': faqs_data
     })
+
 
 if __name__ == "__main__":
     app.run(debug=False)
