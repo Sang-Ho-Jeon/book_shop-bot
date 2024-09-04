@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 
+from dto.chat_response_dto import ChatResponseDto
 from service import crew_service, request_service
 
 bp_chat = Blueprint(
@@ -10,10 +11,6 @@ bp_chat = Blueprint(
 
 chat_messages = []
 
-
-@bp_chat.route("", methods=["GET"])
-def chat():
-    return "Chat Controller"
 
 
 """
@@ -26,20 +23,19 @@ work
 """
 
 
-@bp_chat.route("/crew", methods=["POST"])
-def chatCrew():
-    print(chat_messages)
+@bp_chat.route("", methods=["POST"])
+def chat_crew_controller():
     data = request.json
     user_input = data.get('user_input')
 
     # CREW AI 를 통한 채팅
     crew_result = crew_service.chat_crew(user_input, chat_messages)
 
-    # spring 서버에 api 요청
-    spring_result = request_service.search_api(crew_result)
+    # TODO : crew_result[available] 가 True 일 때만 실행할 수 있도록 변경
+    chat_dto: ChatResponseDto = request_service.prompt_executor(crew_result)
 
     # 결과 종합
-    bot_response = crew_result['bot_response']
+    total_bot_reply = chat_dto
 
     # TODO : chat_messages 를 DB 에 연결하여 사용할 수 있도록 변경
     chat_messages.append({
@@ -47,10 +43,12 @@ def chatCrew():
         'message': user_input,
     })
     chat_messages.append({
-        'role': 'bot',
-        'message': bot_response
+        'role': 'assistant',
+        'message': total_bot_reply
     })
 
     return jsonify({
-        'bot_response': str(crew_result),
+        'bot_response': chat_dto.bot_reply,
+        'content' : chat_dto.reply_content,
+        'url': crew_result['url']
     })

@@ -3,7 +3,6 @@ from sqlalchemy.orm import sessionmaker
 
 from models import Base
 
-
 def init_db(env_config):
     # 환경 변수 셋팅
     user_id = env_config.DATABASE_USERID

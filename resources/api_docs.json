@@ -51,50 +51,10 @@
         "summary": "도서 리스트 조회",
         "parameters": [
           {
-            "name": "page",
-            "in": "query",
-            "description": "현재 페이지 번호",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "example": 1
-            }
-          },
-          {
-            "name": "pageSize",
-            "in": "query",
-            "description": "한 페이지 결과 수",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "example": 10
-            }
-          },
-          {
-            "name": "order_criteria",
-            "in": "query",
-            "description": "정렬 기준",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "example": "book_reg_date"
-            }
-          },
-          {
-            "name": "order_direction",
-            "in": "query",
-            "description": "정렬 방향",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "example": "ASC"
-            }
-          },
-          {
-            "name": "keyword",
+            "name": "title",
             "in": "query",
             "description": "검색 키워드",
-            "required": false,
+            "required": true,
             "schema": {
               "type": "string"
             }
@@ -102,7 +62,7 @@
         ],
         "responses": {
           "200": {
-            "description": "도서 리스트 반환"
+            "description": "검색 도서 반환"
           }
         }
       }
@@ -145,20 +105,18 @@
         }
       }
     },
-
     "/cscenter/faq/list": {
       "get": {
         "operationId": "getFaqList",
         "summary": "FAQ 리스트 조회",
         "parameters": [
           {
-            "name": "cateCode",
+            "name": "title_or_content",
             "in": "query",
-            "description": "카테고리 코드 번호",
+            "description": "제목 또는 내용 검색 키워드",
             "required": true,
             "schema": {
-              "type": "String",
-              "example": "00"
+              "type": "String"
             }
           }
         ],
