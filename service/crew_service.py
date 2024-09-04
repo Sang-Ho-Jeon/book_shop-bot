@@ -1,7 +1,6 @@
 from xml.etree.ElementTree import indent
 
 from crewai import Crew, Agent, Task
-from crewai_tools import JSONSearchTool
 from langchain_openai import ChatOpenAI
 import os
 import json
