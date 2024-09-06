@@ -3,6 +3,7 @@ from flask_cors import CORS  # CORS 모듈 추가
 from dotenv import load_dotenv
 import os
 from openai import OpenAI
+from controller.login_controller import isValidUser
 
 from database import get_db, init_db
 from sqlalchemy import text
@@ -44,6 +45,9 @@ def make_prompt(user_input):
 
 @app.route('/', methods=["POST"])
 def index():
+    user_id = isValidUser()
+    print(user_id)
+
     db = next(get_db(session_factory))
     bot_response = ""
     books_data = []
@@ -52,12 +56,9 @@ def index():
     data = request.json
     user_input = data.get('user_input').lower()  # 입력을 소문자로 변환
     print(user_input)
-    print("All cookies:", request.cookies)
-    print("세션",session)
     # 사용자의 상태를 추적하기 위한 세션 사용
     if 'state' not in session:
         session['state'] = None
-        print('세션 객체 비어있음')
 
     # 사용자가 도서 검색 상태인지 확인
     if session['state'] == 'book_search':
@@ -122,12 +123,10 @@ def index():
 
     elif "책" in user_input or "isbn" in user_input or "도서" in user_input:
         session['state'] = 'book_search'
-        print('보낼때', session)
         bot_response = "도서명을 입력하세요. '종료'라고 입력하면 검색을 종료합니다."
 
     elif "faq" in user_input or "자주 묻는 질문" in user_input:
         session['state'] = 'faq_search'
-        print('보낼때', session)
         bot_response = "FAQ 질문을 입력하세요. '종료'라고 입력하면 검색을 종료합니다."
 
     else:

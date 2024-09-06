@@ -1,37 +1,56 @@
-import jwt
+from jose import jwt
+from jose.exceptions import JWTError, ExpiredSignatureError, JWTClaimsError
 from flask import Blueprint, request, jsonify
+import datetime
 
-bp_login = Blueprint(
-    name="login",
-    import_name=__name__,
-    url_prefix="/login"
-)
-
-# 비밀 키 (JWT 생성 시 사용한 비밀 키와 동일해야 함)
+# JWT Configuration
 SECRET_KEY = 'SoGaYeon'
+SIGNATURE_ALGORITHM = 'HS256'
 
 def isValidUser():
-    # 요청 헤더에서 Authorization 헤더로부터 JWT 토큰 추출
+    print(SECRET_KEY)
+    print(SIGNATURE_ALGORITHM)
+    # Extract JWT token from the Authorization header
     token = request.headers.get('Authorization')
+    print("Received token:", token)
+    print("Received token:", type(token))
     
     if not token:
-        return jsonify({"message": "토큰이 필요합니다!"}), 403
-    
-    try:
-        # 'Bearer ' 부분을 제거 후 토큰만 추출
-        token = token.split(" ")[1]
-        
-        # JWT 서명을 검증하고, 토큰을 디코딩
-        decoded = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+        return {"message": "Token is required!"}, 403
 
-        # 토큰에서 유저 정보(id)를 추출 (이 경우 pswd는 토큰에 포함되지 않음이 일반적임)
-        user_id = decoded.get('id')  # 토큰에서 추출한 사용자 ID
+    # Check if the token format is correct
+    if not token.startswith("Bearer "):
+        return {"message": "Incorrect token format!"}, 400
+
+    try:
+        # Remove 'Bearer ' prefix and strip any whitespace
+        token = token.split(" ")[1].strip()
+        print("Token after stripping:", token)
+        print("Token after stripping:", type(token))
         
-        # 유저가 검증되었으면 True 반환
-        return user_id  # 또는 True를 반환하여 로그인 여부를 확인
-    
-    except jwt.ExpiredSignatureError:
-        return False  # 토큰 만료 시 False 반환
-    
-    except jwt.InvalidTokenError:
-        return False  # 유효하지 않은 토큰일 때 False 반환
+        # Decode the JWT token
+        decoded = jwt.decode(token, SECRET_KEY, algorithms=[SIGNATURE_ALGORITHM])
+        print("Decoded token:", decoded)
+
+        # Extract user ID from token (assuming 'sub' is used as the subject identifier)
+        user_id = decoded.get('sub')
+        print("User ID from token:", user_id)
+
+        # If user is verified, return user ID
+        return user_id
+
+    except ExpiredSignatureError:
+        print("Token has expired")
+        return {"message": "Token has expired"}, 401
+
+    except JWTClaimsError as e:
+        print("Invalid claims in token:", str(e))
+        return {"message": "Invalid claims: " + str(e)}, 403
+
+    except JWTError as e:
+        print("Invalid token:", str(e))
+        return {"message": "Invalid token: " + str(e)}, 403
+
+    except Exception as e:
+        print("Unexpected error:", str(e))
+        return {"message": "Unexpected error: " + str(e)}, 500
