@@ -8,12 +8,9 @@ SECRET_KEY = 'SoGaYeon'
 SIGNATURE_ALGORITHM = 'HS256'
 
 def isValidUser():
-    print(SECRET_KEY)
-    print(SIGNATURE_ALGORITHM)
     # Extract JWT token from the Authorization header
     token = request.headers.get('Authorization')
     print("Received token:", token)
-    print("Received token:", type(token))
     
     if not token:
         return {"message": "Token is required!"}, 403
@@ -25,8 +22,6 @@ def isValidUser():
     try:
         # Remove 'Bearer ' prefix and strip any whitespace
         token = token.split(" ")[1].strip()
-        print("Token after stripping:", token)
-        print("Token after stripping:", type(token))
         
         # Decode the JWT token
         decoded = jwt.decode(token, SECRET_KEY, algorithms=[SIGNATURE_ALGORITHM])

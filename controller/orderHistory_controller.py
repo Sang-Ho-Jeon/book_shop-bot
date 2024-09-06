@@ -38,4 +38,4 @@ def order_history():
         return jsonify({"message": "로그인 후 질문해주세요."}), 401
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=8000)
