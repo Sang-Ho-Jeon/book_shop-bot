@@ -31,6 +31,8 @@ def chat_crew_controller():
     # CREW AI 를 통한 채팅
     crew_result = crew_service.chat_crew(user_input, chat_messages)
 
+    print(crew_result)
+
     # TODO : crew_result[available] 가 True 일 때만 실행할 수 있도록 변경
     chat_dto: ChatResponseDto = request_service.prompt_executor(crew_result)
 

@@ -58,6 +58,7 @@ return : ChatResponseDto
     bot_reply : str
     reply_content : list<book>
         book : dict
+            reply_type : str
             title : str
             isbn : str
             pub_name : str
@@ -87,6 +88,7 @@ def _search_book(crew_response):
 
     reply_content = [
         {
+            "reply_type" : "book",
             "title": book.title,
             "isbn": book.isbn,
             "pub_name": book.pub_name,
@@ -133,13 +135,58 @@ def _search_faq(crew_response):
                 """)
     faq_list = db.execute(query, {"input": f"%{user_input}%"}).fetchall()
 
+    print(faq_list)
+
     reply_content = [
         {
+            "reply_type": "faq",
             "title": faq.title,
             "content": faq.cont,
             "view_cnt": faq.view_cnt,
         }
         for faq in faq_list
+    ]
+
+    chat_dto = ChatResponseDto(
+        bot_reply=crew_response['bot_reply'],
+        reply_content=reply_content
+    )
+
+    return chat_dto
+
+"""
+role : /order/list 요청에 대한 응답을 반환하는 역할
+parameter : crew_response:dict
+return : ChatResponseDto
+    bot_reply : str
+    reply_content : list<order>
+        order : dict
+            order_id : int
+            product : str
+            price : int
+"""
+def _search_order(crew_response):
+    config = Config()
+    session_factory = init_db(config)
+    db = next(get_db(session_factory))
+
+    parameters = crew_response['parameters']
+    user_input = parameters['title_or_content'].strip()
+    query = text("""
+                    SELECT order_id, product, price 
+                    FROM orders 
+                    WHERE product LIKE :input
+                """)
+    order_list = db.execute(query, {"input": f"%{user_input}%"}).fetchall()
+
+    reply_content = [
+        {
+            "reply_type": "order",
+            "order_id": order.order_id,
+            "product": order.product,
+            "price": order.price,
+        }
+        for order in order_list
     ]
 
     chat_dto = ChatResponseDto(
